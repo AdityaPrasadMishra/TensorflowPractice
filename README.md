@@ -1,2 +1,4 @@
 # TensorflowPractice
-FSLPROEJCT+Other stuff
+FSLPRoject inside the folder "FSL - Entire Project + Report"
+
+Tensorflow Practice

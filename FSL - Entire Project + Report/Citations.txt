@@ -1,0 +1,66 @@
+# Code Borrowed from https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/examples/tutorials/mnist/mnist_deep.py (In Files Exp1.py to Exp6.py)
+def weight_variable(shape):
+  """weight_variable generates a weight variable of a given shape."""
+  initial = tf.truncated_normal(shape, stddev=0.1/math.sqrt(float(hiddenlayer_units)))
+  return tf.Variable(initial)
+
+
+def bias_variable(shape):
+  """bias_variable generates a bias variable of a given shape."""
+  initial = tf.constant(0.1, shape=shape)
+  return tf.Variable(initial)
+
+#Code boorrowed from https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/examples/tutorials/mnist/mnist.py (In Files Exp1.py to Exp6.py)
+  with tf.name_scope('hiddenlayer1'):
+    weights = tf.Variable(
+        tf.truncated_normal([MNIST_IMAGE_PIXELS, hiddenlayer_units],
+                            stddev=1.0 / math.sqrt(float(MNIST_IMAGE_PIXELS))),
+        name='weights')
+    biases = tf.Variable(tf.zeros([hiddenlayer_units]),
+                         name='biases')
+    hidden1 = tf.nn.relu(tf.matmul(images, weights) + biases)
+#All the other network nodes were simillarly constructued
+
+
+
+#Code Borrowed from https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/examples/tutorials/mnist/mnist_deep.py (In Files Exp1.py to Exp6.py)
+  with tf.name_scope('loss'):
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_,
+                                                            logits=y_output)
+  cross_entropy = tf.reduce_mean(cross_entropy)
+
+  with tf.name_scope('adam_optimizer'):
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
+  with tf.name_scope('accuracy'):
+    correct_prediction = tf.equal(tf.argmax(y_output, 1), tf.argmax(y_, 1))
+    correct_prediction = tf.cast(correct_prediction, tf.float32)
+  accuracy = tf.reduce_mean(correct_prediction)
+
+  graph_location = "tfgraphs/"+expno
+  print('Saving graph to: %s' % graph_location)
+  train_writer = tf.summary.FileWriter(graph_location)
+  train_writer.add_graph(tf.get_default_graph())
+  resultarray =[]
+  iterarray=[]
+  accarray=[]
+  testaccarray = []
+
+  with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for i in range(20000):
+      batch = mnist.train.next_batch(50)
+      if i % 100 == 0:
+        train_accuracy = accuracy.eval(feed_dict={
+            x: batch[0], y_: batch[1]})
+        testaccuracy = accuracy.eval(feed_dict={
+        x: mnist.test.images, y_: mnist.test.labels})
+        #print('step %d, training accuracy %g' % (i, train_accuracy))
+        #print('test accuracy %g' %testaccuracy)
+        iterarray.append(i)
+        accarray.append(train_accuracy)
+        testaccarray.append(testaccuracy)
+      train_step.run(feed_dict={x: batch[0], y_: batch[1]})
+    resultarray.append(iterarray)
+    resultarray.append(accarray)
+    resultarray.append(testaccarray)
